@@ -1,0 +1,70 @@
+1、如果项目中导入不了文件名
+    file->projector structure->modules 手动向项目中导入文件。
+2、pom.xml中配置依赖包出错，导入不进去。
+   去maven仓库官网中找到对应依赖合适的版本和正确的写法。
+3、mybatis与spring整合只写接口不写具体类。
+   XML提供SQL DAO提供接口。
+4、DAO层配置顺序
+   (1)进行数据库设计，创建数据库、创建表等数据库操作（sql/schema.sql）。
+   (2)在entity类中写入数据库每个表的实体/属性(entity/*)。
+   (3)实现数据库表中各种操作的接口(dao/*)。
+   (4)配置mybatis全局属性 resources/mybatis-config.xml。
+   (5)基于mybatis进行Dao编程:
+      对接口中的方法进行mapper映射，为Dao接口定义sql语句(resources/mapper/*)。
+   (6)mybatis整合spring:
+        a、配置jdbc.properties 用于连接数据库。
+        b、配置spring-dao.xml 重点在连接数据库操作、配置sqlSessionFactory。
+5、Dao的工作主要是：接口设计+SQL编写，实现SQL和代码分离。
+6、Dao拼接等逻辑在service层完成。
+7、Spring-IOC注入方式和场景。
+    XML：Bean实现类来自第三方类库，如DataSource;需要命名空间配置如Context、aop、mvc等。
+    注解：项目中自身开发使用的类，可直接在代码中使用注解如：@Service,@Controller等。
+    Java配置类：需要通过代码控制对象创建逻辑的场景，如自定义修改依赖类库。
+   本项目IOC使用：XML配置——>package-scan——>Annotation
+
+8、声明式事务：开启事务——>修改SQL1——>修改SQL2——>修改SQL3——>提交/回滚事务
+   声明式事务使用方式：
+   a、早期使用2.0：ProxyFactoryBean + XML
+   b、一次性配置永久生效：tx：advice + aop命名空间
+   c、注解控制：注解@Transactional（推荐）
+   事务方法的嵌套：
+   传播行为——>propagation-required...
+
+9、spring web开发主要由spring MVC 框架实现
+   围绕handler开发，由数据Model和页面View组成
+
+10、打开tomcat报错"源服务器未能找到目标资源的表示或者是不愿公开一个已经存在的资源表示。"
+    需要将项目部署到tomcat上：https://www.cnblogs.com/zhongxinWang/p/11775096.html
+
+
+---高并发优化
+1、秒杀地址接口分析
+   无法使用CDN缓存，适合使用服务端缓存：redis等
+   一次性维护成本低
+2、秒杀地址接口优化：请求地址——>redis——>mysql
+3、秒杀操作：无法使用CDN缓存、后端会出现库存问题、热点商品会出现行数据竞争
+4、成本分析
+    运维成本和稳定性不高：NoSQL , MQ等
+    开发成本：数据一致性、回滚方案等
+    幂等性难保证：重复秒杀问题
+    不适合新手的架构
+5、为什么不要mysql解决，瓶颈分析？
+   （1）、update减库存：网络延迟问题和GC操作
+   （2）、insert购买明细：网络延迟问题和GC操作
+    (3)、commit/rollback
+6、优化分析：行级锁在Commit之后释放——>优化方向减少行级锁持有时间
+   优化逻辑：减少事务锁的时间，把客户端逻辑放在MYSQL服务器端，避免网络延迟和GC的影响
+   两种解决方案：
+   ——定制SQL方案：update/* + [auto_commit]*/,需要修改MYSQL源码。
+   ——使用存储过程：整个事务在MYSQL端完成
+7、安装redis出现各种异常：
+   查看redis执行端口：ps -ef | grep -i redis
+   redis-server不是全局变量查看open -t ~/.bash_profile文件 查看是否是全局路径：export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+8、关于大型项目部署:CDN、WebServer:Nginx+Jetty、Redis、MySQL
+9、大型部署架构
+   流量——>通过DNS查到服务器地址，一般是Ngix地址，可以帮服务器做负载均衡——>Ngix里面有逻辑集群Jetty——>
+   （ ——>Jetty里面会用到Redis缓存集群—
+      ——>分库分表(mod(seckill)——>统计分析ES
+    )
+10、如何使用debug模式 设置断点
+
