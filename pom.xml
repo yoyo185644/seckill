@@ -57,7 +57,7 @@
     <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
-      <version>0.9.5.2</version>
+      <version>0.9.5.4</version>
     </dependency>
     <!--3、DAO层依赖：mybatis自身依赖和自身实现的mybatis-spring依赖-->
     <dependency>
