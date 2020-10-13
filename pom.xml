@@ -24,7 +24,7 @@
       <!--是一个单元测试框架 junit4默认使用注解的方式-->
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
 <!--    补全项目依赖 1、日志 Java日志：slf4j、logback、common-logging-->
